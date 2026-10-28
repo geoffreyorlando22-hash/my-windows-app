@@ -1,5 +1,5 @@
 
-name: Build Windows EXE
+name: Build Windows EXE 32-bit
 
 on:
   workflow_dispatch:
@@ -11,22 +11,26 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Get source code
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Install 32-bit Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          architecture: "x86"
+
+      - name: Check Python architecture
+        run: python -c "import struct; print(struct.calcsize('P') * 8)"
 
       - name: Install PyInstaller
         run: python -m pip install pyinstaller
 
-      - name: Build EXE
-        run: python -m PyInstaller --onefile --windowed app.py
+      - name: Build 32-bit EXE
+        run: python -m PyInstaller --clean --onefile --windowed --name MyApp app.py
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
-          name: My-Windows-App
-          path: dist/app.exe
+          name: MyApp-Windows-32bit
+          path: dist/MyApp.exe
